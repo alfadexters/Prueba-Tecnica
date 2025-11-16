@@ -13,17 +13,13 @@ public class DevOpsController {
     private static final String API_KEY_HEADER = "X-Parse-REST-API-Key";
     private static final String EXPECTED_API_KEY = "2f5ae96c-b558-4c7b-a590-a501ae1c36f6";
 
-    /**
-     * Endpoint principal: solo permite POST
-     */
+    // SOLO POST es el método válido
     @PostMapping
     public ResponseEntity<?> handleDevOps(
             @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
             @RequestBody DevOpsRequest request
     ) {
-        // Validar API Key
         if (apiKey == null || !EXPECTED_API_KEY.equals(apiKey)) {
-            // Podríamos devolver 401, pero el cuerpo sigue siendo "ERROR"
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body("ERROR");
@@ -35,9 +31,7 @@ public class DevOpsController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Otros métodos HTTP deben devolver la cadena "ERROR"
-     */
+    // TODOS los otros métodos HTTP deben devolver "ERROR" (incluyendo GET)
     @RequestMapping(method = {
             RequestMethod.GET,
             RequestMethod.PUT,

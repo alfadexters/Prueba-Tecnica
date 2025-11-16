@@ -17,7 +17,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Permitimos acceso sin autenticación a /DevOps
                         .requestMatchers("/DevOps/**").permitAll()
-                        // Si quieres puedes dejar todo lo demás abierto también
                         .anyRequest().permitAll()
                 );
 
