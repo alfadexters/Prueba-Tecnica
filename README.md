@@ -32,24 +32,6 @@ Este repositorio contiene la implementación completa de un Reto Técnico de Dev
 
 -----
 
-## 🧵 Arquitectura General
-
-La solución utiliza un balanceador de carga Nginx para distribuir peticiones entre dos instancias idénticas del microservicio (estrategia Round Robin).
-
-```mermaid
-graph TD
-    A[Usuario / API] --> B(http://host:8080/DevOps)
-    B --> C{Nginx LB<br>(docker 8080)}
-    C -- Round Robin --> D[App Node 1<br>(devops-app-1)]
-    C -- Round Robin --> E[App Node 2<br>(devops-app-2)]
-    D[Spring Boot /DevOps<br>Port 8080 internal]
-    E[Spring Boot /DevOps<br>Port 8080 internal]
-```
-
-Cada solicitud al puerto `8080` es manejada por **Nginx**, que la redirige a uno de los dos contenedores del microservicio (`devops-app-1` o `devops-app-2`).
-
------
-
 ## 🛠️ Funcionalidad del Endpoint `/DevOps`
 
 ### 📌 Método Permitido: `POST`
