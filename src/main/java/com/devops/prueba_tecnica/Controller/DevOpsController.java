@@ -2,6 +2,7 @@ package com.devops.prueba_tecnica.Controller;
 
 import com.devops.prueba_tecnica.DTO.DevOpsRequest;
 import com.devops.prueba_tecnica.DTO.DevOpsResponse;
+import com.devops.prueba_tecnica.Service.ApiAuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,16 +11,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/DevOps")
 public class DevOpsController {
 
-    private static final String API_KEY_HEADER = "X-Parse-REST-API-Key";
-    private static final String EXPECTED_API_KEY = "2f5ae96c-b558-4c7b-a590-a501ae1c36f6";
+    private final ApiAuthService apiAuthService;
 
-    // SOLO POST es el método válido
+    public DevOpsController(ApiAuthService apiAuthService) {
+        this.apiAuthService = apiAuthService;
+    }
+
+    // ÚNICO método válido: POST
     @PostMapping
     public ResponseEntity<?> handleDevOps(
-            @RequestHeader(value = API_KEY_HEADER, required = false) String apiKey,
+            @RequestHeader(value = ApiAuthService.API_KEY_HEADER, required = false) String apiKey,
+            @RequestHeader(value = ApiAuthService.JWT_HEADER, required = false) String jwt,
             @RequestBody DevOpsRequest request
     ) {
-        if (apiKey == null || !EXPECTED_API_KEY.equals(apiKey)) {
+
+        if (!apiAuthService.isAuthorized(apiKey, jwt)) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body("ERROR");

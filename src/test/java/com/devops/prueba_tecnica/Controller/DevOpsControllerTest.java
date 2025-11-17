@@ -1,5 +1,6 @@
 package com.devops.prueba_tecnica.Controller;
 
+import com.devops.prueba_tecnica.Service.ApiAuthService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,12 +20,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class DevOpsControllerTest {
 
     private static final String VALID_API_KEY = "2f5ae96c-b558-4c7b-a590-a501ae1c36f6";
+    private static final String DUMMY_JWT = "dummy-jwt-token";
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    void givenValidApiKey_whenPostDevOps_thenReturnExpectedMessage() throws Exception {
+    void givenValidApiKeyAndJwt_whenPostDevOps_thenReturnExpectedMessage() throws Exception {
         String jsonRequest = """
                 {
                   "message": "This is a test",
@@ -35,7 +37,8 @@ class DevOpsControllerTest {
                 """;
 
         mockMvc.perform(post("/DevOps")
-                        .header("X-Parse-REST-API-Key", VALID_API_KEY)
+                        .header(ApiAuthService.API_KEY_HEADER, VALID_API_KEY)
+                        .header(ApiAuthService.JWT_HEADER, DUMMY_JWT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(status().isOk())
@@ -55,7 +58,27 @@ class DevOpsControllerTest {
                 """;
 
         mockMvc.perform(post("/DevOps")
-                        .header("X-Parse-REST-API-Key", "INVALIDA")
+                        .header(ApiAuthService.API_KEY_HEADER, "INVALIDA")
+                        .header(ApiAuthService.JWT_HEADER, DUMMY_JWT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string("ERROR"));
+    }
+
+    @Test
+    void givenMissingJwt_whenPostDevOps_thenReturnErrorAndUnauthorized() throws Exception {
+        String jsonRequest = """
+                {
+                  "message": "This is a test",
+                  "to": "Juan Perez",
+                  "from": "Rita Asturia",
+                  "timeToLifeSec": 45
+                }
+                """;
+
+        mockMvc.perform(post("/DevOps")
+                        .header(ApiAuthService.API_KEY_HEADER, VALID_API_KEY)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(status().isUnauthorized())
